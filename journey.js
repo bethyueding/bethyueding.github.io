@@ -81,8 +81,8 @@
  eyeTrack.querySelector('p').style.opacity=String(S(.65,.86,t)*(1-S(.95,1,t)));
  // One continuous drop rolls down the margin, then falls into the pond.
  const pondRect=pond.getBoundingClientRect(),pondTop=pondRect.top+y,waterDoc=pondTop+pondRect.height*.55;
- // Delay impact until the water surface reaches the viewport midpoint.
- const careTop=topOf(care,y),impactAt=waterDoc-h*.50;
+ // Delay impact until the final page is in view, with water in its upper third.
+ const careTop=topOf(care,y),impactAt=waterDoc-h*.32;
  const marginTravelEnd=waterDoc-h*.92;
  const travel=C((y-careTop+h*.35)/Math.max(1,marginTravelEnd-careTop+h*.35));
  const chin={x:camera.x+camera.w*.342,y:camera.y+camera.h*.187};
@@ -106,13 +106,22 @@
    dx=L(marginX,waterX,turn);dy=L(rollAt(turnAt),h*.86,turn);
  }
  if(y>=centerAt){
-   const fall=C((y-centerAt)/Math.max(1,impactAt-centerAt));
-   // The drop scrolls with the page, then accelerates toward the water.
-   // This preserves its position at the handoff without an upward snap.
    const releaseDoc=centerAt+h*.86;
-   dx=waterX;dy=releaseDoc-y+(waterDoc-releaseDoc)*fall*fall;
+   const perchY=h*.10;
+   // First move upward with the article; then wait near the top edge.
+   const perchAt=releaseDoc-perchY;
+   const fallStart=Math.max(perchAt,impactAt-h*.22);
+   dx=waterX;
+   if(y<perchAt){
+     dy=releaseDoc-y;
+   }else if(y<fallStart){
+     dy=perchY;
+   }else{
+     const fall=C((y-fallStart)/Math.max(1,impactAt-fallStart));
+     dy=L(perchY,waterY,fall*fall);
+   }
  }
- const grow=S(.66,.82,t),impact=S(impactAt,impactAt+h*.16,y);
+ const grow=S(.66,.82,t),impact=S(impactAt,impactAt+h*.03,y);
  const dropSize=(w<700?26:44)*grow*(1-impact);
  if(dropSize>0){draw(quad(dx-dropSize*.5,dy-dropSize*.72,dropSize,dropSize*1.5),'tear',0,grow*(1-impact));}
  const ringProgress=S(impactAt,impactAt+h*.45,y);
