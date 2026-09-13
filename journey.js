@@ -81,12 +81,14 @@
  eyeTrack.querySelector('p').style.opacity=String(S(.65,.86,t)*(1-S(.95,1,t)));
  // One continuous drop rolls down the margin, then falls into the pond.
  const pondRect=pond.getBoundingClientRect(),pondTop=pondRect.top+y,waterDoc=pondTop+pondRect.height*.55;
- const careTop=topOf(care,y),impactAt=waterDoc-h*.92;
- const travel=C((y-careTop+h*.35)/Math.max(1,impactAt-careTop+h*.35));
+ // Delay impact until the water surface reaches the viewport midpoint.
+ const careTop=topOf(care,y),impactAt=waterDoc-h*.50;
+ const marginTravelEnd=waterDoc-h*.92;
+ const travel=C((y-careTop+h*.35)/Math.max(1,marginTravelEnd-careTop+h*.35));
  const chin={x:camera.x+camera.w*.342,y:camera.y+camera.h*.187};
  const transfer=S(.78,1,t);
  const marginX=w*(w<700?.965:.965)+Math.sin(travel*Math.PI*3)*Math.min(7,w*.008);
- const rollAt=scroll=>h*(.78+.03*C((scroll-careTop+h*.35)/Math.max(1,impactAt-careTop+h*.35))**2);
+ const rollAt=scroll=>h*(.78+.03*C((scroll-careTop+h*.35)/Math.max(1,marginTravelEnd-careTop+h*.35))**2);
  const rollingY=rollAt(y);
  const waterX=pondRect.left+pondRect.width*.5,waterY=waterDoc-y;
  let dx=L(chin.x,marginX,transfer),dy=L(chin.y,rollingY,transfer);
@@ -105,7 +107,10 @@
  }
  if(y>=centerAt){
    const fall=C((y-centerAt)/Math.max(1,impactAt-centerAt));
-   dx=waterX;dy=L(h*.86,h*.92,fall*fall);
+   // The drop scrolls with the page, then accelerates toward the water.
+   // This preserves its position at the handoff without an upward snap.
+   const releaseDoc=centerAt+h*.86;
+   dx=waterX;dy=releaseDoc-y+(waterDoc-releaseDoc)*fall*fall;
  }
  const grow=S(.66,.82,t),impact=S(impactAt,impactAt+h*.16,y);
  const dropSize=(w<700?26:44)*grow*(1-impact);
