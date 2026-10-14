@@ -32,7 +32,7 @@
  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform2f(uniforms.viewport,w,h);gl.uniform1f(uniforms.crystal,0);
  const work=document.querySelector('#create'),workTop=topOf(work,y);
  const workProgress=C((y-workTop)/Math.max(1,work.offsetHeight-h));
- const u=C(S(.28,1,p)*.85+workProgress*1.2),left=sx-size*.5,top=sy-size*.5;
+ const u=C(S(.28,1,p)*.85+workProgress*1.2),left=sx-size*.5,top=sy-size*(.23+.27*S(.05,.63,p));
  gl.uniform1f(uniforms.uncoil,u);
  if(p<1&&!paused){const focus=S(.12,.50,p),spread=L(1,1.35,focus);const box=document.querySelector('.staff-caption').getBoundingClientRect();gl.uniform4f(uniforms.textBox,box.left/w,box.top/h,(box.left+box.width)/w,(box.top+box.height)/h);gl.uniform1f(uniforms.time,paused?0:now*.001);gl.uniform1f(uniforms.wingFocus,focus);const op=(.7+.3*focus)*(1-S(.68,.90,p));draw(wings(left,top,size,-1,now,paused,spread),'staff',2,op);draw(wings(left,top,size,1,now,paused,spread),'staff',3,op);draw(quad(left,top,size,size),'staff',1,op);}
  work.style.setProperty('--scale-wash','0');

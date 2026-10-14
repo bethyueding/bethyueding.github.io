@@ -22,8 +22,9 @@
    gl_FragColor=mix(a,b,blend);
  }`;
  function compile(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error('Gaze shader');return s;}
+ const ready=img=>img.complete&&img.naturalWidth>0;
  function init(){
-  if(!base.naturalWidth||!left.naturalWidth||window.drawPortrait)return;
+  if(!ready(base)||!ready(left)||window.drawPortrait)return;
   try{
    const program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))return;gl.useProgram(program);
    const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
@@ -32,9 +33,13 @@
    canvas.width=base.naturalWidth;canvas.height=base.naturalHeight;gl.viewport(0,0,canvas.width,canvas.height);
    const blend=gl.getUniformLocation(program,'blend'),vertical=gl.getUniformLocation(program,'vertical');
    window.drawPortrait=(mix,y)=>{gl.uniform1f(blend,mix);gl.uniform1f(vertical,y);gl.drawArrays(gl.TRIANGLES,0,6);};
-   window.drawPortrait(0,0);stage.classList.add('vertical-gaze-ready');
-  }catch{stage.classList.remove('vertical-gaze-ready');}
+   window.drawPortrait(1,0);
+   if(gl.getError()!==gl.NO_ERROR)throw Error('Portrait texture upload');
+   stage.classList.add('vertical-gaze-ready');
+  }catch{window.drawPortrait=null;stage.classList.remove('vertical-gaze-ready');}
  }
- base.addEventListener('load',init);left.addEventListener('load',init);init();
+ base.addEventListener('load',init);left.addEventListener('load',init);
+ Promise.all([base,left].map(img=>img.decode?img.decode().catch(()=>{}):null)).then(init);
+ init();
  canvas.addEventListener('webglcontextlost',()=>{window.drawPortrait=null;stage.classList.remove('vertical-gaze-ready');});
 })();

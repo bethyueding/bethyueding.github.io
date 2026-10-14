@@ -3,9 +3,8 @@ const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
 const smooth=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t);};
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 let paused=reduce.matches;
-const toggle=document.querySelector('#motion-toggle');
-function setMotion(){document.body.classList.toggle('paused',paused);toggle.textContent=paused?'Enable motion':'Pause motion';toggle.setAttribute('aria-pressed',String(paused));requestFrame();}
-toggle.addEventListener('click',()=>{paused=!paused;setMotion();});
+document.querySelector('#motion-toggle')?.remove();
+function setMotion(){document.body.classList.toggle('paused',paused);requestFrame();}
 reduce.addEventListener('change',()=>{paused=reduce.matches;setMotion();});
 
 // Two original portraits, animated with vanilla JavaScript and CSS opacity.
@@ -30,8 +29,8 @@ function setupSnake(){
  }catch{c.remove();snake.style.display='';}
 }
 if(snake.complete&&snake.naturalWidth)setupSnake();else snake.addEventListener('load',setupSnake,{once:true});
-let expressionTarget=0;
-let pointer={x:innerWidth*.49,y:innerHeight*.36},current={...pointer},gaze={x:0,y:0},touched=false,frame=0,expressionBlend=0;
+let expressionTarget=1;
+let pointer={x:innerWidth*.49,y:innerHeight*.36},current={...pointer},gaze={x:0,y:0},touched=false,frame=0,expressionBlend=1;
 const fine=matchMedia('(pointer:fine)');
 window.addEventListener('pointermove',e=>{if(!fine.matches||paused)return;pointer={x:e.clientX,y:e.clientY};
  // Require a deliberate horizontal gesture. Mostly vertical motion never
@@ -60,7 +59,7 @@ function render(now=performance.now()){const dt=Math.min(50,Math.max(0,now-lastF
  const sx=current.x*(1-landing)+w*(mobile?.72:.62)*landing;
  const sy=current.y*(1-landing)+h*(mobile?.61:.48)*landing;
  const size=(mobile?54:78)+(mobile?278:536)*landing;
- staff.style.width=size+'px';staff.style.transform=`translate(${sx-size*.5}px,${sy-size*.75}px)`;
+ staff.style.width=size+'px';staff.style.transform=`translate(${sx-size*.5}px,${sy-size*(.345+.405*landing)}px)`;
  staff.style.opacity=String((.53+.47*landing)*(1-depart));
  staff.style.visibility=y>hero.offsetHeight?'hidden':'visible';
  staff.style.filter=`drop-shadow(0 ${10*landing}px ${12*landing}px #6e879633)`;
