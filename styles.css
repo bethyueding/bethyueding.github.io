@@ -230,3 +230,8 @@ html,body{overflow-x:clip}
 #portrait-left{opacity:1}
 #motion-toggle{display:none!important}
 #chapter-cursor img{transform:translate(-50%,-23%)}
+
+/* Dabobo: width-scaled photograph, cropped vertically without magnification. */
+.clippings .dabobo-clipping .essay-cover{display:block;width:100%;height:auto;aspect-ratio:2.15;object-fit:cover;object-position:50% 42%;margin-bottom:16px}
+@media(min-width:701px){.clippings .sunset-clipping{break-before:column}}
+@media(max-width:700px){.clippings .dabobo-clipping .essay-cover{aspect-ratio:1.8}}
